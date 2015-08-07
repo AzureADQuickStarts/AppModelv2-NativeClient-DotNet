@@ -65,44 +65,9 @@ namespace TodoListClient
         {
             base.OnInitialized(e);
 
-            authContext = new AuthenticationContext(authority, new FileCache());
-            AuthenticationResult result = null;
+            // TODO: Initialize the AuthenticationContext
 
-            // As the app starts, we want to check to see if the user is already signed in.
-            // You can do so by trying to get a token from ADAL, passing in the parameter
-            // PromptBehavior.Never.  This forces ADAL to throw an exception if it cannot
-            // get a token for the user without showing a UI.
-   
-            try
-            {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
-
-                // If we got here, a valid token is in the cache.  Proceed to 
-                // fetch the user's tasks from the TodoListService via the 
-                // GetTodoList() method.
-
-                SignInButton.Content = "Clear Cache";
-                GetTodoList();
-            }
-            catch (AdalException ex)
-            {
-                if (ex.ErrorCode == "user_interaction_required")
-                {
-                    // If user interaction is required, the app should take no action,
-                    // and simply show the user the sign in button.
-                }
-                else
-                {
-                    // Here, we catch all other AdalExceptions
-
-                    string message = ex.Message;
-                    if (ex.InnerException != null)
-                    {
-                        message += "Inner Exception : " + ex.InnerException.Message;
-                    }
-                    MessageBox.Show(message);
-                }
-            }
+            // TODO: Check if the user is already signed in. 
         }
         
 
@@ -113,45 +78,10 @@ namespace TodoListClient
 
         private async void GetTodoList()
         {
-            AuthenticationResult result = null;
-            try
-            {
-                // Here, we try to get an access token to call the TodoListService 
-                // without invoking any UI prompt.  PromptBehavior.Never forces
-                // ADAL to throw an exception if it cannot get a token silently.
 
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
-            }
-            catch (AdalException ex)
-            {
-                // ADAL couldn't get a token silently, so show the user a message
-                // and let them click the Sign-In button.
-
-                if (ex.ErrorCode == "user_interaction_required")
-                {
-                    MessageBox.Show("Please sign in first");
-                    SignInButton.Content = "Sign In";
-                }
-                else
-                {
-                    // In any other case, an unexpected error occurred.
-
-                    string message = ex.Message;
-                    if (ex.InnerException != null)
-                    {
-                        message += "Inner Exception : " + ex.InnerException.Message;
-                    }
-                    MessageBox.Show(message);
-                }
-
-                return;
-            }
-
-            // Once the token has been returned by ADAL, 
-            // add it to the http authorization header, 
-            // before making the call to access the To Do list service.
-
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+            // TODO: Get a token from ADAL, and attach
+            // it to the GET request in the Authorization
+            // header.
 
 
             // Call the To Do list service.
@@ -226,56 +156,9 @@ namespace TodoListClient
 
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
-            // If the user clicked the 'clear cache' button,
-            // clear the ADAL token cache and show the user as signed out.
-            // It's also necessary to clear the cookies from the browser
-            // control so the next user has a chance to sign in.
+            // TODO: Sign the user out if they clicked the "Clear Cache" button
 
-            if (SignInButton.Content.ToString() == "Clear Cache")
-            {
-                TodoList.ItemsSource = string.Empty;
-                authContext.TokenCache.Clear();
-                ClearCookies();
-                SignInButton.Content = "Sign In";
-                return;
-            }
-
-            // If the user clicked the 'Sign-In' button, force
-            // ADAL to prompt the user for credentials by specifying
-            // PromptBehavior.Always.  ADAL will get a token for the 
-            // TodoListService and cache it for you.
-
-            AuthenticationResult result = null;
-            try
-            {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Always, null));
-                SignInButton.Content = "Clear Cache";
-                GetTodoList();
-            }
-            catch (AdalException ex)
-            {
-                // If ADAL cannot get a token, it will throw an exception.
-                // If the user canceled the login, it will result in the 
-                // error code 'authentication_canceled'.
-
-                if (ex.ErrorCode == "authentication_canceled")
-                {
-                    MessageBox.Show("Sign in was canceled by the user");
-                }
-                else
-                {
-                    // An unexpected error occurred.
-                    string message = ex.Message;
-                    if (ex.InnerException != null)
-                    {
-                        message += "Inner Exception : " + ex.InnerException.Message;
-                    }
-
-                    MessageBox.Show(message);
-                }
-
-                return;
-            }
+            // TODO: Invoke UI & get a token if the user clicked "Sign In"
 
         }
 
