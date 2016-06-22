@@ -1,4 +1,4 @@
-﻿using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+﻿using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +18,7 @@ namespace TodoListClient
         private static readonly object FileLock = new object();
 
         // Initializes the cache against a local file.
-        // If the file is already rpesent, it loads its content in the ADAL cache
+        // If the file is already present, it loads its content in the MSAL cache
         public FileCache(string filePath=@".\TokenCache.dat")
         {
             CacheFilePath = filePath;
@@ -31,13 +31,13 @@ namespace TodoListClient
         }
 
         // Empties the persistent store.
-        public override void Clear()
+        public override void Clear(string clientId)
         {
-            base.Clear();
+            base.Clear(clientId);
             File.Delete(CacheFilePath);
         }
 
-        // Triggered right before ADAL needs to access the cache.
+        // Triggered right before MSAL needs to access the cache.
         // Reload the cache from the persistent store in case it changed since the last access.
          void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
@@ -47,7 +47,7 @@ namespace TodoListClient
             }
         }
 
-        // Triggered right after ADAL accessed the cache.
+        // Triggered right after MSAL accessed the cache.
         void AfterAccessNotification(TokenCacheNotificationArgs args)
         {
             // if the access operation resulted in a cache update

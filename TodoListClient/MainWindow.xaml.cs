@@ -31,13 +31,13 @@ using System.Windows.Shapes;
 
 // The following using statements were added for this sample.
 using System.Globalization;
-using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Identity.Client;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Script.Serialization;
 using System.Runtime.InteropServices;
 using System.Configuration;
-using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+
 
 namespace TodoListClient
 {
@@ -52,49 +52,49 @@ namespace TodoListClient
         // The Redirect URI is the URI where the v2.0 endpoint will return OAuth responses.
         // The Authority is the sign-in URL.
         
-        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
+        
         private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        Uri redirectUri = new Uri(ConfigurationManager.AppSettings["ida:RedirectUri"]);
-        private static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, "common");
+        
         private static string todoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
 
         private HttpClient httpClient = new HttpClient();
-        private AuthenticationContext authContext = null;
+        private PublicClientApplication app = null;
 
         protected override async void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
 
-            authContext = new AuthenticationContext(authority, new FileCache());
+            // TODO: Initialize the PublicClientApplication
+            app = new PublicClientApplication(clientId)
+            {
+                UserTokenCache = new FileCache(),
+            };
             AuthenticationResult result = null;
 
+            // TODO: Check if the user is already signed in. 
             // As the app starts, we want to check to see if the user is already signed in.
-            // You can do so by trying to get a token from ADAL, passing in the parameter
-            // PromptBehavior.Never.  This forces ADAL to throw an exception if it cannot
+            // You can do so by trying to get a token from MSAL, using the method
+            // AcquireTokenSilent.  This forces MSAL to throw an exception if it cannot
             // get a token for the user without showing a UI.
-   
             try
             {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
-
-                // If we got here, a valid token is in the cache.  Proceed to 
-                // fetch the user's tasks from the TodoListService via the 
-                // GetTodoList() method.
-
+                result = await app.AcquireTokenSilentAsync(new string[] { clientId });
+                // If we got here, a valid token is in the cache - or MSAL was able to get a new oen via refresh token.
+                // Proceed to fetch the user's tasks from the TodoListService via the GetTodoList() method.
+                
                 SignInButton.Content = "Clear Cache";
                 GetTodoList();
             }
-            catch (AdalException ex)
+            catch (MsalException ex)
             {
-                if (ex.ErrorCode == "user_interaction_required")
+                if (ex.ErrorCode == "failed_to_acquire_token_silently")
                 {
                     // If user interaction is required, the app should take no action,
                     // and simply show the user the sign in button.
                 }
                 else
                 {
-                    // Here, we catch all other AdalExceptions
-
+                    // Here, we catch all other MsalExceptions
                     string message = ex.Message;
                     if (ex.InnerException != null)
                     {
@@ -104,7 +104,7 @@ namespace TodoListClient
                 }
             }
         }
-        
+
 
         public MainWindow()
         {
@@ -113,21 +113,26 @@ namespace TodoListClient
 
         private async void GetTodoList()
         {
+
+            // TODO: Get a token from MSAL, and attach
+            // it to the GET request in the Authorization
+            // header.
+
             AuthenticationResult result = null;
             try
             {
-                // Here, we try to get an access token to call the TodoListService 
-                // without invoking any UI prompt.  PromptBehavior.Never forces
-                // ADAL to throw an exception if it cannot get a token silently.
+                // Here, we try to get an access token to call the TodoListService
+                // without invoking any UI prompt.  AcquireTokenSilentAsync forces
+                // MSAL to throw an exception if it cannot get a token silently.
 
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
+                result = await app.AcquireTokenSilentAsync(new string[] { clientId });
             }
-            catch (AdalException ex)
+            catch (MsalException ex)
             {
-                // ADAL couldn't get a token silently, so show the user a message
+                // MSAL couldn't get a token silently, so show the user a message
                 // and let them click the Sign-In button.
 
-                if (ex.ErrorCode == "user_interaction_required")
+                if (ex.ErrorCode == "failed_to_acquire_token_silently")
                 {
                     MessageBox.Show("Please sign in first");
                     SignInButton.Content = "Sign In";
@@ -147,12 +152,11 @@ namespace TodoListClient
                 return;
             }
 
-            // Once the token has been returned by ADAL, 
-            // add it to the http authorization header, 
+            // Once the token has been returned by MSAL,
+            // add it to the http authorization header,
             // before making the call to access the To Do list service.
 
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
-
 
             // Call the To Do list service.
             HttpResponseMessage response = await httpClient.GetAsync(todoListBaseAddress + "/api/todolist");
@@ -185,11 +189,11 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
+                result = await app.AcquireTokenSilentAsync(new string[] { clientId });
             }
-            catch (AdalException ex)
+            catch (MsalException ex)
             {
-                if (ex.ErrorCode == "user_interaction_required")
+                if (ex.ErrorCode == "failed_to_acquire_token_silently")
                 {
                     MessageBox.Show("Please sign in first");
                     SignInButton.Content = "Sign In";
@@ -226,36 +230,38 @@ namespace TodoListClient
 
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
+            // TODO: Sign the user out if they clicked the "Clear Cache" button
+
             // If the user clicked the 'clear cache' button,
-            // clear the ADAL token cache and show the user as signed out.
+            // clear the MSAL token cache and show the user as signed out.
             // It's also necessary to clear the cookies from the browser
             // control so the next user has a chance to sign in.
 
             if (SignInButton.Content.ToString() == "Clear Cache")
             {
                 TodoList.ItemsSource = string.Empty;
-                authContext.TokenCache.Clear();
+                app.UserTokenCache.Clear(app.ClientId);
                 ClearCookies();
                 SignInButton.Content = "Sign In";
                 return;
             }
 
             // If the user clicked the 'Sign-In' button, force
-            // ADAL to prompt the user for credentials by specifying
-            // PromptBehavior.Always.  ADAL will get a token for the 
-            // TodoListService and cache it for you.
+            // MSAL to prompt the user for credentials by using
+            // AcquireTokenAsync, a method that is guaranteed to show a prompt to the user.
+            // MSAL will get a token for the TodoListService and cache it for you.
 
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Always, null));
+                result = await app.AcquireTokenAsync(new string[] { clientId });
                 SignInButton.Content = "Clear Cache";
                 GetTodoList();
             }
-            catch (AdalException ex)
+            catch (MsalException ex)
             {
-                // If ADAL cannot get a token, it will throw an exception.
-                // If the user canceled the login, it will result in the 
+                // If MSAL cannot get a token, it will throw an exception.
+                // If the user canceled the login, it will result in the
                 // error code 'authentication_canceled'.
 
                 if (ex.ErrorCode == "authentication_canceled")
@@ -277,9 +283,12 @@ namespace TodoListClient
                 return;
             }
 
+
+            // TODO: Invoke UI & get a token if the user clicked "Sign In"
+
         }
 
-        // This function clears cookies from the browser control used by ADAL.
+        // This function clears cookies from the browser control used by MSAL.
         private void ClearCookies()
         {
             const int INTERNET_OPTION_END_BROWSER_SESSION = 42;
