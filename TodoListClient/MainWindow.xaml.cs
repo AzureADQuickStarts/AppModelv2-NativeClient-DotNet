@@ -31,13 +31,13 @@ using System.Windows.Shapes;
 
 // The following using statements were added for this sample.
 using System.Globalization;
-using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Identity.Client;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Script.Serialization;
 using System.Runtime.InteropServices;
 using System.Configuration;
-using Microsoft.Experimental.IdentityModel.Clients.ActiveDirectory;
+
 
 namespace TodoListClient
 {
@@ -52,24 +52,22 @@ namespace TodoListClient
         // The Redirect URI is the URI where the v2.0 endpoint will return OAuth responses.
         // The Authority is the sign-in URL.
         
-        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        Uri redirectUri = new Uri(ConfigurationManager.AppSettings["ida:RedirectUri"]);
-        private static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, "common");
+        
+        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];        
         private static string todoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
 
         private HttpClient httpClient = new HttpClient();
-        private AuthenticationContext authContext = null;
+        private PublicClientApplication app = null;
 
         protected override async void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
 
-            // TODO: Initialize the AuthenticationContext
+            // TODO: Initialize the PublicClientApplication
 
             // TODO: Check if the user is already signed in. 
         }
-        
+
 
         public MainWindow()
         {
@@ -79,7 +77,7 @@ namespace TodoListClient
         private async void GetTodoList()
         {
 
-            // TODO: Get a token from ADAL, and attach
+            // TODO: Get a token from MSAL, and attach
             // it to the GET request in the Authorization
             // header.
 
@@ -115,9 +113,9 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(new string[] { clientId }, null, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never, null));
+                result = await app.AcquireTokenSilentAsync(new string[] { clientId });
             }
-            catch (AdalException ex)
+            catch (MsalException ex)
             {
                 if (ex.ErrorCode == "user_interaction_required")
                 {
@@ -162,7 +160,7 @@ namespace TodoListClient
 
         }
 
-        // This function clears cookies from the browser control used by ADAL.
+        // This function clears cookies from the browser control used by MSAL.
         private void ClearCookies()
         {
             const int INTERNET_OPTION_END_BROWSER_SESSION = 42;
