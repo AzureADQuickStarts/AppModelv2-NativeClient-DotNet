@@ -47,6 +47,13 @@ namespace TodoListClient
         private HttpClient httpClient = new HttpClient();
         private PublicClientApplication app = null;
 
+        private string Scope
+        {
+            get
+            {
+                return $"api://{clientId}/access_as_user";
+            }
+        }
         protected override async void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
@@ -62,7 +69,7 @@ namespace TodoListClient
             // get a token for the user without showing a UI.
             try
             {
-                result = await app.AcquireTokenSilentAsync(new string[] { clientId }, app.Users.FirstOrDefault());
+                result = await app.AcquireTokenSilentAsync(new string[] { Scope }, app.Users.FirstOrDefault());
                 // If we got here, a valid token is in the cache - or MSAL was able to get a new oen via refresh token.
                 // Proceed to fetch the user's tasks from the TodoListService via the GetTodoList() method.
                 
@@ -109,7 +116,7 @@ namespace TodoListClient
                 // without invoking any UI prompt.  AcquireTokenSilentAsync forces
                 // MSAL to throw an exception if it cannot get a token silently.
 
-                result = await app.AcquireTokenSilentAsync(new string[] { clientId }, app.Users.FirstOrDefault());
+                result = await app.AcquireTokenSilentAsync(new string[] { Scope }, app.Users.FirstOrDefault());
             }
             catch (MsalException ex)
             {
@@ -173,7 +180,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(new string[] { clientId }, app.Users.FirstOrDefault());
+                result = await app.AcquireTokenSilentAsync(new string[] { Scope }, app.Users.FirstOrDefault());
             }
             catch (MsalException ex)
             {
@@ -248,7 +255,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenAsync(new string[] { clientId });
+                result = await app.AcquireTokenAsync(new string[] { Scope });
                 SignInButton.Content = "Clear Cache";
                 GetTodoList();
             }
