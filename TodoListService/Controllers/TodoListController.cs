@@ -39,7 +39,11 @@ namespace TodoListService.Controllers
         // GET api/todolist
         public IEnumerable<TodoItem> Get()
         {
-            // A user's To Do list is keyed off of the NameIdentifier claim, which contains an immutable, unique identifier for the user.
+            // You can use the ClaimsPrincipal to access information about the
+            // user making the call.  In this case, we use the 'sub' or
+            // NameIdentifier claim to serve as a key for the tasks in the data store.
+			// the NameIdentififier claim contains an immutable, unique identifier for the use
+
             Claim subject = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier);
 
             return from todo in todoBag
