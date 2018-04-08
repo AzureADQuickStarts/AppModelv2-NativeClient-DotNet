@@ -13,23 +13,17 @@ namespace TodoListService
 {
     public partial class Startup
     {
-        private static string clientId = ConfigurationManager.AppSettings["ida:Audience"];
+        private static string audience = ConfigurationManager.AppSettings["ida:Audience"];
 
         public void ConfigureAuth(IAppBuilder app)
         {
             var tvps = new TokenValidationParameters
             {
-                // In this app, the TodoListClient and TodoListService
-                // are represented using the same Application Id - we use
-                // the Application Id to represent the audience, or the
-                // intended recipient of tokens.
-
-                ValidAudience = clientId,
+                ValidAudience = audience,
 
                 // In a real applicaiton, you might use issuer validation to
                 // verify that the user's organization (if applicable) has 
                 // signed up for the app.  Here, we'll just turn it off.
-
                 ValidateIssuer = false,
             };
 
