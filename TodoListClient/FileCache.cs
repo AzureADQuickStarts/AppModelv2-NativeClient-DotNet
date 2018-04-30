@@ -25,8 +25,9 @@
 //
 //------------------------------------------------------------------------------
 
-using Microsoft.Identity.Client;
 using System.IO;
+using System.Security.Cryptography;
+using Microsoft.Identity.Client;
 
 namespace TodoListClient
 {
@@ -53,7 +54,7 @@ namespace TodoListClient
         /// <summary>
         /// Path to the token cache
         /// </summary>
-        public static string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + "msalcache.txt";
+        public static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
 
         private static readonly object FileLock = new object();
 
@@ -62,7 +63,9 @@ namespace TodoListClient
             lock (FileLock)
             {
                 args.TokenCache.Deserialize(File.Exists(CacheFilePath)
-                    ? File.ReadAllBytes(CacheFilePath)
+                    ? ProtectedData.Unprotect(File.ReadAllBytes(CacheFilePath),
+                                              null,
+                                              DataProtectionScope.CurrentUser)
                     : null);
             }
         }
@@ -75,12 +78,15 @@ namespace TodoListClient
                 lock (FileLock)
                 {
                     // reflect changesgs in the persistent store
-                    File.WriteAllBytes(CacheFilePath, args.TokenCache.Serialize());
+                    File.WriteAllBytes(CacheFilePath,
+                                       ProtectedData.Protect(args.TokenCache.Serialize(), 
+                                                             null, 
+                                                             DataProtectionScope.CurrentUser)
+                                      );
                     // once the write operationtakes place restore the HasStateChanged bit to filse
                     args.TokenCache.HasStateChanged = false;
                 }
             }
         }
     }
-
 }
