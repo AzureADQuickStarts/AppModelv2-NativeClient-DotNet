@@ -96,7 +96,7 @@ To restrict who can sign in to your application, use one of the options:
 
 You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*:
 
-1. In the **web.config** file of your **TodoListService**, change the value for the `Tenant` parameter from `Common` to the tenant name of the organization, such as `contoso.onmicrosoft.com`.
+1. In the **web.config** file of your **TodoListService**, change the value for the `Tenant` parameter from `Common` to the tenant name of the organization, such as `contoso.onmicrosoft.com` or the *Tenant Id*.
 2. In your [OWIN Startup class](#configure-the-authentication-pipeline), set the `ValidateIssuer` argument to `true`.
 
 ### Option 2: Restrict access to a list of known organizations
@@ -108,15 +108,15 @@ You can restrict sign-in access to only user accounts that are in an Azure AD or
 
 ### Option 3: Restrict the categories of users that can sign-in to your application
 
-This scenario is a common for *SaaS* applications that are focused only on either consumers or organizations, therefore want to block accepting either personal accounts or work or school accounts.
+This scenario is a common for *SaaS* applications that are focused on either consumers or organizations, therefore want to block accepting either personal accounts or work or school accounts.
 
 1. In the **web.config** file of your **TodoListService**, use on of the values below for `Tenant` parameter:
 
     Value | Description
     ----- | --------
-    `common` | users can sign in with any Work and School account, or Microsoft Personal account
-    `organizations` |  users can sign in with any Work and School account
-    `consumers` |  users can sign in with a Microsoft Personal account
+    `common` | Users can sign in with any Work and School account, or Microsoft Personal account
+    `organizations` |  Users can sign in with any Work and School account
+    `consumers` |  Users can sign in with a Microsoft Personal account
 
     > Note: the values above are not considered a *tenant*, but a *convention* to restrict certain categories of users
 
