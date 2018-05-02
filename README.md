@@ -20,7 +20,7 @@ The sample also include a Windows Desktop application (WPF) that demonstrate how
 
 ## How to run this sample
 
-> Pre-requisites: This sample requires Visual Studio 2015 Update 3 or Visual Studio 2017. Don’t have it? Download [Visual Studio 2017 for free](https://www.visualstudio.com/downloads/).
+> Pre-requisites: This sample requires Visual Studio 2017. If you don't have it, download [Visual Studio 2017 for free](https://www.visualstudio.com/downloads/).
 
 ### Step 1: Download or clone this sample
 
@@ -39,7 +39,7 @@ You can clone this sample from your shell or command line:
 
 > Note: When you add a *Web API* the Application registration portal, it adds a pre-defined App Id URI and Scope, using the format *api://{Application Id}/{Scope Name}* named **access_as_user** (you can review it by clicking 'Edit' button). This sample code uses this default scope.
 
-### Step 3: Configure your *TodoListService* project to match the Web API you just registered
+### Step 3: Configure your *TodoListService* and *TodoListClient* projects to match the Web API you just registered
 
 1. Open the solution in Visual Studio and then open the **Web.config** file under the root of **TodoListService** project.
 1. Replace the value of `ida:ClientId` parameter with the **Application Id** from the application you just registered in the Application Registration Portal.
@@ -88,7 +88,7 @@ One of the ways to allow users from other directories to acces your Web API is b
 
 ## Optional: Restrict sign-in access to your application
 
-By default, when download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceeding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
+By default, when you download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceeding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
 
 To restrict who can sign in to your application, use one of the options:
 
