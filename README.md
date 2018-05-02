@@ -73,7 +73,7 @@ In this step, you configure your *TodoListClient* project by registering a new a
 
 ### Step 7: Pre-authorize your client application
 
-One of the ways to allow users from other directories to acces your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. In order to do this:
+One of the ways to allow users from other directories to acces your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
 
 1. Go back to the *Application registration portal* and open the properties of your **TodoListService**.
 1. In the **Web API platform**, click on **Add application** under the *Pre-authorized applications* section.
@@ -88,7 +88,7 @@ One of the ways to allow users from other directories to acces your Web API is b
 
 ## Optional: Restrict sign-in access to your application
 
-By default, when download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceeding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can sign in to your application. This is typically used on SaaS applications.
+By default, when download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceeding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
 
 To restrict who can sign in to your application, use one of the options:
 
@@ -97,29 +97,8 @@ To restrict who can sign in to your application, use one of the options:
 You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*:
 
 1. In the **web.config** file of your **TodoListService**, change the value for the `Tenant` parameter from `Common` to the tenant name of the organization, such as `contoso.onmicrosoft.com` or the *Tenant Id*.
-2. In your [OWIN Startup class](#configure-the-authentication-pipeline), set the `ValidateIssuer` argument to `true`.
+2. Open **App_Start\Startup.Auth** file and set the `ValidateIssuer` argument to `true`.
 
-### Option 2: Restrict access to a list of known organizations
-
-You can restrict sign-in access to only user accounts that are in an Azure AD organization that is in the list of allowed organizations:
-
-1. In your [OWIN Startup class](#configure-the-authentication-pipeline), set the `ValidateIssuer` argument to `true`.
-2. Set the value of the `ValidIssuers` parameter to the list of allowed organizations.
-
-### Option 3: Restrict the categories of users that can sign-in to your application
-
-This scenario is a common for *SaaS* applications that are focused on either consumers or organizations, therefore want to block accepting either personal accounts or work or school accounts.
-
-1. In the **web.config** file of your **TodoListService**, use on of the values below for `Tenant` parameter:
-
-    Value | Description
-    ----- | --------
-    `common` | Users can sign in with any Work and School account, or Microsoft Personal account
-    `organizations` |  Users can sign in with any Work and School account
-    `consumers` |  Users can sign in with a Microsoft Personal account
-
-    > Note: the values above are not considered a *tenant*, but a *convention* to restrict certain categories of users
-
-#### Option 4: Use a custom method to validate issuers
+#### Option 2: Use a custom method to validate issuers
 
 You can implement a custom method to validate issuers by using the **IssuerValidator** parameter. For more information about how to use this parameter, read about the [TokenValidationParameters class](https://msdn.microsoft.com/library/system.identitymodel.tokens.tokenvalidationparameters.aspx) on MSDN.
