@@ -39,28 +39,26 @@ namespace TodoListClient
         // The Authority is the sign-in URL.
         
         
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
+        private string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
+        
+        // The todoListServiceBaseAddress is the address of your Web API
+        private string todoListServiceBaseAddress = ConfigurationManager.AppSettings["TodoListServiceBaseAddress"];
+        private string todoListServiceScope = ConfigurationManager.AppSettings["TodoListServiceScope"];
 
-        // The todoListBaseAddress is the address of your Web API
-        private static string todoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
-        private static string todoListScope = ConfigurationManager.AppSettings["todo:Scope"];
 
         private HttpClient httpClient = new HttpClient();
         private PublicClientApplication app = null;
 
-        private string[] Scopes
-        {
-            get
-            {
-                return new string[] { todoListScope };
-            }
-        }
+        private string[] Scopes = null;
+        
         protected override async void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
 
+            Scopes = new string[] {todoListServiceScope};
+
             // Initialize the PublicClientApplication
-            app = new PublicClientApplication(clientId, "https://login.microsoftonline.com/common/", TokenCacheHelper.GetUserCache());
+            app = new PublicClientApplication(clientId, "https://login.microsoftonline.com/common/v2.0", TokenCacheHelper.GetUserCache());
             AuthenticationResult result = null;
 
             // TODO: Check if the user is already signed in. 
@@ -155,7 +153,7 @@ namespace TodoListClient
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Call the To Do list service.
-            HttpResponseMessage response = await httpClient.GetAsync(todoListBaseAddress + "/api/todolist");
+            HttpResponseMessage response = await httpClient.GetAsync(todoListServiceBaseAddress + "/api/todolist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -211,7 +209,7 @@ namespace TodoListClient
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             HttpContent content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("Title", TodoText.Text) });
-            HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
+            HttpResponseMessage response = await httpClient.PostAsync(todoListServiceBaseAddress + "/api/todolist", content);
 
             if (response.IsSuccessStatusCode)
             {

@@ -36,14 +36,40 @@ namespace TodoListService.Controllers
         //
         static ConcurrentBag<TodoItem> todoBag = new ConcurrentBag<TodoItem>();
 
+        private ClaimsIdentity userClaims;
+
+        public TodoListController()
+        {
+            userClaims = User.Identity as ClaimsIdentity;
+        }
+
+        /// <summary>
+        /// Assure the presence of a scope claim containing a specific scope (i.e. access_as_user)
+        /// </summary>
+        /// <param name="scopeName">The name of the scope</param>
+        private void CheckAccessTokenScope(string scopeName)
+        {
+            // Make sure access_as_user scope is present
+            string scopeClaimValue = userClaims.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value;
+            if (!string.Equals(scopeClaimValue, scopeName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    ReasonPhrase = @"Please request an access token to scope '{scopeName}'"
+                });
+            }
+        }
+
         // GET api/todolist
         public IEnumerable<TodoItem> Get()
         {
+            CheckAccessTokenScope("access_as_user");
+            
             // You can use the ClaimsPrincipal to access information about the
             // user making the call.  In this case, we use the 'sub' or
             // NameIdentifier claim to serve as a key for the tasks in the data store.
-			// the NameIdentififier claim contains an immutable, unique identifier for the use
-
+            // the NameIdentififier claim contains an immutable, unique identifier for the use
+            
             Claim subject = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier);
 
             return from todo in todoBag
@@ -54,6 +80,8 @@ namespace TodoListService.Controllers
         // POST api/todolist
         public void Post(TodoItem todo)
         {
+            CheckAccessTokenScope("access_as_user");
+
             if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
             {
                 todoBag.Add(new TodoItem { Title = todo.Title, Owner = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier).Value });
