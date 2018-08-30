@@ -22,6 +22,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows;
 
@@ -68,7 +69,8 @@ namespace TodoListClient
             // get a token for the user without showing a UI.
             try
             {
-                result = await app.AcquireTokenSilentAsync(Scopes, app.Users.FirstOrDefault());
+                var accounts = await app.GetAccountsAsync();
+                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
                 // If we got here, a valid token is in the cache - or MSAL was able to get a new oen via refresh token.
                 // Proceed to fetch the user's tasks from the TodoListService via the GetTodoList() method.
                 
@@ -105,7 +107,7 @@ namespace TodoListClient
             InitializeComponent();
         }
 
-        private async void GetTodoList()
+        private async Task GetTodoList()
         {
 
             // Get a token from MSAL, and attach
@@ -118,8 +120,8 @@ namespace TodoListClient
                 // Here, we try to get an access token to call the TodoListService
                 // without invoking any UI prompt.  AcquireTokenSilentAsync forces
                 // MSAL to throw an exception if it cannot get a token silently.
-
-                result = await app.AcquireTokenSilentAsync(Scopes, app.Users.FirstOrDefault());
+                var accounts = await app.GetAccountsAsync();
+                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
             }
             catch (MsalException ex)
             {
@@ -183,7 +185,8 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(Scopes, app.Users.FirstOrDefault());
+                var accounts = await app.GetAccountsAsync();
+                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
             }
             catch (MsalException ex)
             {
@@ -226,11 +229,13 @@ namespace TodoListClient
         /// Clears the cache
         /// </summary>
         /// <param name="app"></param>
-        private void ClearCache(IPublicClientApplication app)
+        private async Task ClearCache(IPublicClientApplication app)
         {
-            foreach(IUser user in app.Users.ToArray())
+            var accounts = await app.GetAccountsAsync();
+            while (accounts.Any())
             {
-                app.Remove(user);
+                await app.RemoveAsync(accounts.First());
+                accounts = await app.GetAccountsAsync();
             }
         }
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
@@ -245,7 +250,7 @@ namespace TodoListClient
             if (SignInButton.Content.ToString() == "Clear Cache")
             {
                 TodoList.ItemsSource = string.Empty;
-                ClearCache(app);
+                await ClearCache(app);
                 SignInButton.Content = "Sign In";
                 return;
             }
