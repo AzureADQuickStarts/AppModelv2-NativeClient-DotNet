@@ -72,7 +72,11 @@ If you want to register your apps manually, as a first step you'll need to:
 
 1. Open the **app.config** file located in **TodoListClient** project's root folder and then paste **Application Id** from the application you just registered for your *TodoListService* under `TodoListServiceScope` parameter, replacing the string `{Enter the Application Id of your TodoListService from the app registration portal}`.
 
-    > Note: Make sure it uses has the format `api://{TodoListService-Application-Id}/access_as_user` (where {TodoListService-Application-Id} is the Guid representing the Application Id for your TodoListService).
+   > Note: Make sure it uses the following format:
+   >
+   > `api://{TodoListService-Application-Id}/access_as_user` 
+   >
+   >(where {TodoListService-Application-Id} is the Guid representing the Application Id for your TodoListService).
 
 ### Step 3:  Register the client app (TodoListClient)
 
@@ -84,34 +88,33 @@ In this step, you configure your *TodoListClient* project by registering a new a
 1. Select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `NativeClient-DotNet-TodoListClient`.
-   - Change **Supported account types** to **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+   - Change **Supported account types** to **Accounts in any organizational directory**.
    - Select **Register** to create the application.
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in `TodoListClient\App.Config`).
 1. From the app's Overview page, select the **Authentication** section.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
    - Select **Save**.
 1. Select the **API permissions** section
    - Click the **Add a permission** button and then,
-   - Ensure that the **My APIs** tab is selected
+   - Select the **My APIs** tab.
    - In the list of APIs, select the `AppModelv2-NativeClient-DotNet-TodoListService API`, or the name you entered for the Web API.
-   - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
+   - Check the **access_as_user** permission if it's not already checked. Use the search box if necessary.
    - Select the **Add permissions** button
 
 #### Configure your *TodoListClient* project
 
-1. In the *Application registration portal*, copy the value of the **Application Id**
+1. In the *Application registration portal*, in the **Overview** page copy the value of the **Application (client) Id**
 1. Open the **app.config** file located in the **TodoListClient** project's root folder and then paste the value in the `ida:ClientId` parameter value
 
 ### Step 4: Run your project
 
 1. Press `<F5>` to run your project. Your *TodoListClient* should open.
-1. Select **Sign in** in the top right and sign in with the same user you have used to register your aplication, or a user in the same directory.
+1. Select **Sign in** in the top right and sign in with the same user you have used to register your application, or a user in the same directory.
 1. At this point, if you are signing in for the first time, you may be prompted to consent to *TodoListService* Web Api.
 1. The sign-in also request the access token to the *access_as_user* scope to access *TodoListService* Web Api and manipulate the *To-Do* list.
 
 ### Step 5: Pre-authorize your client application
 
-One of the ways to allow users from other directories to acces your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
+One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
 
 1. Go back to the *Application registration portal* and open the properties of your **TodoListService**.
 1. In the **Expose an API** section, click on **Add application** under the *Pre-authorized applications* section.

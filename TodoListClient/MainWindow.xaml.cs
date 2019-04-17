@@ -48,7 +48,7 @@ namespace TodoListClient
 
 
         private HttpClient httpClient = new HttpClient();
-        private PublicClientApplication app = null;
+        private IPublicClientApplication app = null;
 
         private string[] Scopes = null;
         
@@ -59,8 +59,11 @@ namespace TodoListClient
             Scopes = new string[] {todoListServiceScope};
 
             // Initialize the PublicClientApplication
-            app = new PublicClientApplication(clientId, "https://login.microsoftonline.com/common/v2.0", TokenCacheHelper.GetUserCache());
-            AuthenticationResult result = null;
+            app = PublicClientApplicationBuilder.Create(clientId)
+                .Build();
+				
+			TokenCacheHelper.EnableSerialization(app.UserTokenCache);
+
 
             // TODO: Check if the user is already signed in. 
             // As the app starts, we want to check to see if the user is already signed in.
@@ -70,7 +73,8 @@ namespace TodoListClient
             try
             {
                 var accounts = await app.GetAccountsAsync();
-                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                var result = await app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+			                      .ExecuteAsync();
                 // If we got here, a valid token is in the cache - or MSAL was able to get a new oen via refresh token.
                 // Proceed to fetch the user's tasks from the TodoListService via the GetTodoList() method.
                 
@@ -121,7 +125,9 @@ namespace TodoListClient
                 // without invoking any UI prompt.  AcquireTokenSilentAsync forces
                 // MSAL to throw an exception if it cannot get a token silently.
                 var accounts = await app.GetAccountsAsync();
-                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
             }
             catch (MsalException ex)
             {
@@ -186,7 +192,9 @@ namespace TodoListClient
             try
             {
                 var accounts = await app.GetAccountsAsync();
-                result = await app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
             }
             catch (MsalException ex)
             {
@@ -231,11 +239,11 @@ namespace TodoListClient
         /// <param name="app"></param>
         private async Task ClearCache(IPublicClientApplication app)
         {
-            var accounts = await app.GetAccountsAsync();
+            var accounts = (await app.GetAccountsAsync()).ToList();
             while (accounts.Any())
             {
                 await app.RemoveAsync(accounts.First());
-                accounts = await app.GetAccountsAsync();
+                accounts = (await app.GetAccountsAsync()).ToList();
             }
         }
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
@@ -261,10 +269,18 @@ namespace TodoListClient
             // MSAL will get a token for the TodoListService and cache it for you.
 
             AuthenticationResult result = null;
+            var accounts = await app.GetAccountsAsync();
             try
             {
-                result = await app.AcquireTokenAsync(Scopes);
-                SignInButton.Content = "Clear Cache";
+                result = await app.AcquireTokenInteractive(Scopes)
+                    .WithAccount(accounts.FirstOrDefault())
+                    .WithPrompt(Prompt.SelectAccount)
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+                Dispatcher.Invoke(() =>
+                {
+                    SignInButton.Content = "Clear Cache";
+                });
                 GetTodoList();
             }
             catch (MsalException ex)
