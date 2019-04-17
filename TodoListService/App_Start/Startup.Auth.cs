@@ -27,9 +27,11 @@ namespace TodoListService
                     new TokenValidationParameters
                     {
                         // Check if the audience is intended to be this application
-                        ValidAudience = clientId,
+                        ValidAudiences = new [] { clientId, $"api://{clientId}" },
 
                         // Change below to 'true' if you want this Web API to accept tokens issued to one Azure AD tenant only (single-tenant)
+                        // Note that this is a simplification for the quickstart here. You should validate the issuer. For details, 
+                        // see https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore
                         ValidateIssuer = false,
 
                     },
