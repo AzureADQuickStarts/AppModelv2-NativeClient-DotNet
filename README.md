@@ -114,13 +114,13 @@ In this step, you configure your *TodoListClient* project by registering a new a
 
 ### Step 5: Pre-authorize your client application
 
-One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
+One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of **Authorized client applications** for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application:
 
 1. Go back to the *Application registration portal* and open the properties of your **TodoListService**.
-1. In the **Expose an API** section, click on **Add application** under the *Pre-authorized applications* section.
-1. In the *Application ID* field, paste the application ID of the `TodoListClient` application.
-1. In the *Scope* field, click on the **Select** combo box and select the scope for this Web API `api://<Application ID>/access_as_user`.
-1. Press the **Save** button at the bottom of the page.
+1. In the **Expose an API** section, select **Add a client application** under the *Pre-authorized applications* section.
+1. In the **Client ID** field, paste the application (Client) ID of the `TodoListClient` application.
+1. In the **Authorized Scopes** field, check the scope for this Web API `api://<Application ID>/access_as_user`.
+1. Press the **Add application** button at the bottom of the page.
 
 ### Step 6:  Run your project
 
