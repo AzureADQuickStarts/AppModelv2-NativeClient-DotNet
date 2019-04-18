@@ -114,12 +114,12 @@ In this step, you configure your *TodoListClient* project by registering a new a
 
 ### Step 5: Pre-authorize your client application
 
-One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of **Authorized client applications** for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application:
+One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
 
 1. Go back to the *Application registration portal* and open the properties of your **TodoListService**.
-1. In the **Expose an API** section, select **Add a client application** under the *Pre-authorized applications* section.
-1. In the **Client ID** field, paste the application (Client) ID of the `TodoListClient` application.
-1. In the **Authorized Scopes** field, check the scope for this Web API `api://<Application ID>/access_as_user`.
+1. In the **Expose an API** section, click on **Add a client application** under the *Authorized client applications* section.
+1. In the *Client ID* field, paste the application ID of the `TodoListClient` application.
+1. In the *Authorized scopes* section, select the scope for this Web API `api://<Application ID>/access_as_user`.
 1. Press the **Add application** button at the bottom of the page.
 
 ### Step 6:  Run your project
@@ -137,8 +137,9 @@ To restrict who can sign in to your application, use one of the options:
 
 You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*:
 
+1. Open **App_Start\Startup.Auth** file, and change the value of the metadata endpoint that's passed into the OpenIdConnectSecurityTokenProvider to "https://login.microsoftonline.com/{Tenant ID}/v2.0/.well-known/openid-configuration" (you can also use Tenant Name, such as contoso.onmicrosoft.com).
 1. In the **web.config** file of your **TodoListService**, change the value for the `Tenant` parameter from `Common` to the tenant name of the organization, such as `contoso.onmicrosoft.com` or the *Tenant Id*.
-2. Open **App_Start\Startup.Auth** file and set the `ValidateIssuer` argument to `true`.
+2. In the same file, set the ValidIssuer property on the TokenValidationParameters to "https://sts.windows.net/{Tenant Id}/"the `ValidateIssuer` argument to `true`.
 
 #### Option 2: Use a custom method to validate issuers
 
