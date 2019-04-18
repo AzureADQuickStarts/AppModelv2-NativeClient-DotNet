@@ -137,9 +137,8 @@ To restrict who can sign in to your application, use one of the options:
 
 You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*:
 
-1. Open **App_Start\Startup.Auth** file, and change the value of the metadata endpoint that's passed into the OpenIdConnectSecurityTokenProvider to "https://login.microsoftonline.com/{Tenant ID}/v2.0/.well-known/openid-configuration" (you can also use Tenant Name, such as contoso.onmicrosoft.com).
-1. In the **web.config** file of your **TodoListService**, change the value for the `Tenant` parameter from `Common` to the tenant name of the organization, such as `contoso.onmicrosoft.com` or the *Tenant Id*.
-2. In the same file, set the ValidIssuer property on the TokenValidationParameters to "https://sts.windows.net/{Tenant Id}/"the `ValidateIssuer` argument to `true`.
+1. Open the **App_Start\Startup.Auth** file, and change the value of the metadata endpoint that's passed into the `OpenIdConnectSecurityTokenProvider` to `"https://login.microsoftonline.com/{Tenant ID}/v2.0/.well-known/openid-configuration"` (you can also use the Tenant Name, such as `contoso.onmicrosoft.com`).
+2. In the same file, set the `ValidIssuer` property on the `TokenValidationParameters` to `"https://sts.windows.net/{Tenant Id}/"` and the `ValidateIssuer` argument to `true`.
 
 #### Option 2: Use a custom method to validate issuers
 
