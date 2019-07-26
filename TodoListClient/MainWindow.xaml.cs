@@ -34,9 +34,9 @@ namespace TodoListClient
     public partial class MainWindow : Window
     {
         
-        // The Client ID is used by the application to uniquely identify itself to the v2.0 endpoint
-        // The AAD Instance is the instance of the v2.0 endpoint
-        // The Redirect URI is the URI where the v2.0 endpoint will return OAuth responses.
+        // The Client ID is used by the application to uniquely identify itself to the Microsoft identity platform endpoint
+        // The AAD Instance is the instance of the identity platform endpoint
+        // The Redirect URI is the URI where the identity platform endpoint will return OAuth responses.
         // The Authority is the sign-in URL.
         
         
