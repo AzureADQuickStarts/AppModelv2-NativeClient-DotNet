@@ -39,8 +39,8 @@ namespace TodoListClient
 
         // To authenticate to the To Do list service, the client needs to know the service's App ID URI and URL
 
-        private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListServiceScope"];
-        private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListServiceBaseAddress"];
+        private static readonly string TodoListScope = ConfigurationManager.AppSettings["TodoListServiceScope"];
+        private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["TodoListServiceBaseAddress"];
         private static readonly string[] Scopes = { TodoListScope };
         private static string TodoListApiAddress
         {
@@ -225,6 +225,7 @@ namespace TodoListClient
 
             // Forms encode Todo item, to POST to the todo list web api.
             TodoItem todoItem = new TodoItem() { Title = TodoText.Text };
+
             string json = JsonConvert.SerializeObject(todoItem);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 

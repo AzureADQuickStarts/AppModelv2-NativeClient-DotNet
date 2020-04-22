@@ -20,97 +20,133 @@ The sample also include a Windows Desktop application (WPF) that demonstrate how
 
 ## How to run this sample
 
-> Pre-requisites: This sample requires Visual Studio 2017. If you don't have it, download [Visual Studio 2017 for free](https://www.visualstudio.com/downloads/).
+To run this sample, you'll need:
 
-### Step 1: Download or clone this sample
+- [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
+- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
+- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
-You can clone this sample from your shell or command line:
 
-  ```console
-  git clone https://github.com/AzureADQuickStarts/AppModelv2-NativeClient-DotNet.git
-  ```
+### Step 1:  Clone or download this repository
 
-### Step 2: Register your Web API - *TodoListService* in the *Application registration portal*
+From your shell or command line:
+
+```Shell
+git clone https://github.com/AzureADQuickStarts/appmodelv2-nativeclient-dotnet.git
+```
+
+or download and extract the repository .zip file.
+
+> Given that the name of the sample is quiet long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+
+### Step 2:  Register the sample application with your Azure Active Directory tenant
+
+There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
+
+- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+- or use PowerShell scripts that:
+  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
+  - modify the Visual Studio projects' configuration files.
+
+<details>
+  <summary>Expand this section if you want to use this automation:</summary>
+
+1. On Windows, run PowerShell and navigate to the root of the cloned directory
+1. In PowerShell run:
+
+   ```PowerShell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+   ```
+
+1. Run the script to create your Azure AD application and configure the code of the sample application accordingly.
+1. In PowerShell run:
+
+   ```PowerShell
+   cd .\AppCreationScripts\
+   .\Configure.ps1
+   ```
+
+   > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+   > The scripts also provide a guide to automated application registration, configuration and removal which can help in your CI/CD scenarios.
+
+1. Open the Visual Studio solution and click start to run the code.
+
+</details>
+
+Follow the steps below to manually walk through the steps to register and configure the applications.
 
 #### Choose the Azure AD tenant where you want to create your applications
 
-If you want to register your apps manually, as a first step you'll need to:
+As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
    Change your portal session to the desired Azure AD tenant.
 
-#### Register the service app (TodoListService)
+#### Register the service app (TodoListService (appmodelv2-nativeclient-dotnet))
 
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
-1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `AppModelv2-NativeClient-DotNet-TodoListService`.
-   - Change **Supported account types** to **Accounts in any organizational directory**.
-   - Select **Register** to create the application.
+1. In the **Register an application page** that appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService (appmodelv2-nativeclient-dotnet)`.
+   - Under **Supported account types**, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+1. Select **Register** to create the application.
+1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
+1. Select **Save** to save your changes.
+1. In the app's registration screen, click on the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an Api for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
+The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this Api. To declare an resource URI, follow the following steps:
+   - Click `Set` next to the **Application ID URI** to generate a URI that is unique for this app.
+   - For this sample, accept the proposed Application ID URI (api://{clientId}) by selecting **Save**.
+1. All Apis have to publish a minimum of one [scope](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code) for the client's to obtain an access token successfully. To publish a scope, follow the following steps:
+   - Select **Add a scope** button open the **Add a scope** screen and Enter the values as indicated below:
+        - For **Scope name**, use `access_as_user`.
+        - Select **Admins and users** options for **Who can consent?**
+        - For **Admin consent display name** type `Access TodoListService (appmodelv2-nativeclient-dotnet)`
+        - For **Admin consent description** type `Allows the app to access TodoListService (appmodelv2-nativeclient-dotnet) as the signed-in user.`
+        - For **User consent display name** type `Access TodoListService (appmodelv2-nativeclient-dotnet)`
+        - For **User consent description** type `Allow the application to access TodoListService (appmodelv2-nativeclient-dotnet) on your behalf.`
+        - Keep **State** as **Enabled**
+        - Click on the **Add scope** button on the bottom to save this scope.
 
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in `TodoListService\Web.config`).
-1. Select the **Expose an API** section, and:
-   - Select **Add a scope**
-   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
-   - Enter the following parameters:
-     - for **Scope name** use `access_as_user`
-     - Ensure the **Admins and users** option is selected for **Who can consent**
-     - in **Admin consent display name** type `Access TodoListService as a user`
-     - in **Admin consent description** type `Accesses the TodoListService Web API as a user`
-     - in **User consent display name** type `Access TodoListService as a user`
-     - in **User consent description** type `Accesses the TodoListService Web API as a user`
-     - Keep **State** as **Enabled**
-     - Select **Add scope**
+##### Configure the  service app (TodoListService (appmodelv2-nativeclient-dotnet)) to use your app registration
 
-#### Configure your *TodoListService* and *TodoListClient* projects to match the Web API you just registered
+Open the project in your IDE (like Visual Studio) to configure the code.
+>In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Open the solution in Visual Studio and then open the **Web.config** file under the root of **TodoListService** project.
-1. Replace the value of `ida:ClientId` parameter with the **Client ID (Application Id)** from the application you just registered in the Application Registration Portal.
+1. Open the `TodoListService\Web.config` file
+1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (appmodelv2-nativeclient-dotnet)` application copied from the Azure portal.
 
-#### Add the new scope to the *TodoListClient*`s app.config
-
-1. Open the **app.config** file located in **TodoListClient** project's root folder and then paste **Application Id** from the application you just registered for your *TodoListService* under `TodoListServiceScope` parameter, replacing the string `{Enter the Application Id of your TodoListService from the app registration portal}`.
-
-   > Note: Make sure it uses the following format:
-   >
-   > `api://{TodoListService-Application-Id}/access_as_user` 
-   >
-   >(where {TodoListService-Application-Id} is the Guid representing the Application Id for your TodoListService).
-
-### Step 3:  Register the client app (TodoListClient)
-
-In this step, you configure your *TodoListClient* project by registering a new application in the Application registration portal. In the cases where the client and server are considered *the same application* you may also just reuse the same application registered in the 'Step 2.'. Using the same application is actually needed if you want users to sign-in with Microsoft personal accounts
-
-#### Register the *TodoListClient* application in the *Application registration portal*
+#### Register the client app (TodoListClient (appmodelv2-nativeclient-dotnet))
 
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
-1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `NativeClient-DotNet-TodoListClient`.
-   - Change **Supported account types** to **Accounts in any organizational directory**.
-   - Select **Register** to create the application.
-1. From the app's Overview page, select the **Authentication** section.
-   - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
-   - Select **Save**.
-1. Select the **API permissions** section
+1. In the **Register an application page** that appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListClient (appmodelv2-nativeclient-dotnet)`.
+   - Under **Supported account types**, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+1. Select **Register** to create the application.
+1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
+1. In the app's registration screen, select **Authentication** in the menu.
+   - If you don't have a platform added, select **Add a platform** and select the **Public client (mobile & desktop)** option.
+   - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, select **https://login.microsoftonline.com/common/oauth2/nativeclient**
+
+1. Select **Save** to save your changes.
+1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the Apis that your application needs.
    - Click the **Add a permission** button and then,
-   - Select the **My APIs** tab.
-   - In the list of APIs, select the `AppModelv2-NativeClient-DotNet-TodoListService API`, or the name you entered for the Web API.
-   - Check the **access_as_user** permission if it's not already checked. Use the search box if necessary.
-   - Select the **Add permissions** button
+   - Ensure that the **My APIs** tab is selected.
+   - In the list of APIs, select the API `TodoListService (appmodelv2-nativeclient-dotnet)`.
+   - In the **Delegated permissions** section, select the **access_as_user** in the list. Use the search box if necessary.
+   - Click on the **Add permissions** button at the bottom.
 
-#### Configure your *TodoListClient* project
+##### Configure the  client app (TodoListClient (appmodelv2-nativeclient-dotnet)) to use your app registration
 
-1. In the *Application registration portal*, in the **Overview** page copy the value of the **Application (client) Id**
-1. Open the **app.config** file located in the **TodoListClient** project's root folder and then paste the value in the `ida:ClientId` parameter value
+Open the project in your IDE (like Visual Studio) to configure the code.
+>In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-### Step 4: Run your project
-
-1. Press `<F5>` to run your project. Your *TodoListClient* should open.
-1. Select **Sign in** in the top right and sign in with the same user you have used to register your application, or a user in the same directory.
-1. At this point, if you are signing in for the first time, you may be prompted to consent to *TodoListService* Web Api.
-1. The sign-in also request the access token to the *access_as_user* scope to access *TodoListService* Web Api and manipulate the *To-Do* list.
+1. Open the `TodoListClient\App.Config` file
+1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
+1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (appmodelv2-nativeclient-dotnet)` application copied from the Azure portal.
+1. Find the app key `TodoListServiceScope` and replace the existing value with Scope.
+1. Find the app key `TodoListServiceBaseAddress` and replace the existing value with the base address of the TodoListService (appmodelv2-nativeclient-dotnet) project (by default `https://localhost:44351/`).
 
 ### Step 5: Pre-authorize your client application
 
@@ -124,12 +160,14 @@ One of the ways to allow users from other directories to access your Web API is 
 
 ### Step 6:  Run your project
 
+Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
+
 1. Press `<F5>` to run your project. Your *TodoListClient* should open.
 1. Select **Sign in** in the top right (or Clear Cache/Sign-in) and then sign-in either using a personal Microsoft account (live.com or hotmail.com) or work or school account.
 
 ## Optional: Restrict sign-in access to your application
 
-By default, when you download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceeding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
+By default, when you download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
 
 To restrict who can sign in to your application, use one of the options:
 
