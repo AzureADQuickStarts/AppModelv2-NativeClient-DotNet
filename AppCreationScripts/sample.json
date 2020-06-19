@@ -16,7 +16,7 @@
       "Id": "service",
       "Name": "TodoListService (appmodelv2-nativeclient-dotnet)",
       "Kind": "WebApi",
-      "HomePage": "https://localhost:44351/",
+      "HomePage": "https://localhost:44321/",
       "Audience": "AzureADandPersonalMicrosoftAccount",
       "ManualSteps": [
         {

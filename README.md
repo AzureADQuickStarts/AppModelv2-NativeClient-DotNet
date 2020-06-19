@@ -3,12 +3,21 @@ services: active-directory
 platforms: dotnet
 author: jmprieur
 level: 200
-client: Windows Desktop WPF
-service: ASP.NET Web API
-endpoint: AAD V2
+client: .NET Desktop (WPF)
+service: ASP.NET Core Web API
+endpoint: Microsoft identity platform
+page_type: sample
+languages:
+  - csharp  
+products:
+  - azure
+  - azure-active-directory  
+  - dotnet
+  - office-ms-graph
+description: "This sample demonstrates a .NET Desktop (WPF) application calling a ASP.NET Web API that is secured using Microsoft identity platform"
 ---
 
-# Calling an ASP.NET Web API protected by the Azure AD V2 endpoint from an Windows Desktop (WPF) application
+# Calling an ASP.NET Web API protected by Microsoft identity platform endpoint from an Windows Desktop (WPF) application
 
 ## About this sample
 
@@ -93,11 +102,11 @@ As a first step you'll need to:
 1. Select **Register** to create the application.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. Select **Save** to save your changes.
-1. In the app's registration screen, click on the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an Api for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
-The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this Api. To declare an resource URI, follow the following steps:
+1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an API for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
+The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this API. To declare an resource URI, follow the following steps:
    - Click `Set` next to the **Application ID URI** to generate a URI that is unique for this app.
    - For this sample, accept the proposed Application ID URI (api://{clientId}) by selecting **Save**.
-1. All Apis have to publish a minimum of one [scope](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code) for the client's to obtain an access token successfully. To publish a scope, follow the following steps:
+1. All APIs have to publish a minimum of one [scope](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code) for the client's to obtain an access token successfully. To publish a scope, follow the following steps:
    - Select **Add a scope** button open the **Add a scope** screen and Enter the values as indicated below:
         - For **Scope name**, use `access_as_user`.
         - Select **Admins and users** options for **Who can consent?**
@@ -130,7 +139,7 @@ Open the project in your IDE (like Visual Studio) to configure the code.
    - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, select **https://login.microsoftonline.com/common/oauth2/nativeclient**
 
 1. Select **Save** to save your changes.
-1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the Apis that your application needs.
+1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs.
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected.
    - In the list of APIs, select the API `TodoListService (appmodelv2-nativeclient-dotnet)`.
@@ -146,9 +155,9 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
 1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (appmodelv2-nativeclient-dotnet)` application copied from the Azure portal.
 1. Find the app key `TodoListServiceScope` and replace the existing value with Scope.
-1. Find the app key `TodoListServiceBaseAddress` and replace the existing value with the base address of the TodoListService (appmodelv2-nativeclient-dotnet) project (by default `https://localhost:44351/`).
+1. Find the app key `TodoListServiceBaseAddress` and replace the existing value with the base address of the TodoListService (appmodelv2-nativeclient-dotnet) project (by default `https://localhost:44321/`).
 
-### Step 5: Pre-authorize your client application
+### Step 4: Pre-authorize your client application
 
 One of the ways to allow users from other directories to access your Web API is by *pre-authorizing* the client applications to access your Web API by adding the Application Ids from client applications in the list of *pre-authorized* applications for your Web API. By adding a pre-authorized client, you will not require user to consent to use your Web API. Follow the steps below to pre-authorize your Web Application::
 
@@ -158,7 +167,7 @@ One of the ways to allow users from other directories to access your Web API is 
 1. In the *Authorized scopes* section, select the scope for this Web API `api://<Application ID>/access_as_user`.
 1. Press the **Add application** button at the bottom of the page.
 
-### Step 6:  Run your project
+### Step 5:  Run your project
 
 Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
@@ -167,7 +176,7 @@ Clean the solution, rebuild the solution, and run it.  You might want to go into
 
 ## Optional: Restrict sign-in access to your application
 
-By default, when you download this code sample and configure the application to use the Azure Active Directory v2 endpoint following the preceding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
+By default, when you download this code sample and configure the application to use the Microsoft identity platform endpoint following the preceding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
 
 To restrict who can sign in to your application, use one of the options:
 
