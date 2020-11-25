@@ -42,6 +42,9 @@
       "ManualSteps": [
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+        },
+        {
+          "Comment": "Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
         }
       ]
     }
