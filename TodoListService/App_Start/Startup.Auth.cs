@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using Microsoft.Owin.Security;
+﻿using System.Configuration;
 using Owin;
-using System.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TodoListService
 {
@@ -35,7 +31,7 @@ namespace TodoListService
                         ValidateIssuer = false,
 
                     },
-                    new OpenIdConnectSecurityTokenProvider("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")
+                    new OpenIdConnectSecurityKeyProvider("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")
                 ),
             });
         }

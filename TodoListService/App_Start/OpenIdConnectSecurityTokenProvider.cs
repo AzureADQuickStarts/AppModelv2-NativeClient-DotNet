@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.IdentityModel.Tokens;
 using System.Threading;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 
 namespace TodoListService
@@ -9,19 +10,19 @@ namespace TodoListService
     // This class is necessary because the OAuthBearer Middleware does not leverage
     // the OpenID Connect metadata endpoint exposed by the STS by default.
 
-    public class OpenIdConnectSecurityTokenProvider : IIssuerSecurityTokenProvider
+    public class OpenIdConnectSecurityKeyProvider : IIssuerSecurityKeyProvider
     {
         public ConfigurationManager<OpenIdConnectConfiguration> ConfigManager;
         private string _issuer;
-        private IEnumerable<SecurityToken> _tokens;
+        private ICollection<SecurityKey> _keys;
         private readonly string _metadataEndpoint;
 
         private readonly ReaderWriterLockSlim _synclock = new ReaderWriterLockSlim();
 
-        public OpenIdConnectSecurityTokenProvider(string metadataEndpoint)
+        public OpenIdConnectSecurityKeyProvider(string metadataEndpoint)
         {
             _metadataEndpoint = metadataEndpoint;
-            ConfigManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataEndpoint);
+            ConfigManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataEndpoint, new OpenIdConnectConfigurationRetriever());
 
             RetrieveMetadata();
         }
@@ -55,7 +56,7 @@ namespace TodoListService
         /// <value>
         /// All known security tokens.
         /// </value>
-        public IEnumerable<SecurityToken> SecurityTokens
+        public IEnumerable<SecurityKey> SecurityKeys
         {
             get
             {
@@ -63,7 +64,7 @@ namespace TodoListService
                 _synclock.EnterReadLock();
                 try
                 {
-                    return _tokens;
+                    return _keys;
                 }
                 finally
                 {
@@ -79,7 +80,7 @@ namespace TodoListService
             {
                 OpenIdConnectConfiguration config = ConfigManager.GetConfigurationAsync().Result;
                 _issuer = config.Issuer;
-                _tokens = config.SigningTokens;
+                _keys = config.SigningKeys;
             }
             finally
             {
