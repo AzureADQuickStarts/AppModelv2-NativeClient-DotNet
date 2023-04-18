@@ -31,7 +31,7 @@ The sample also include a Windows Desktop application (WPF) that demonstrate how
 
 To run this sample, you'll need:
 
-- [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
+- [Visual Studio 2022](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
 - A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
@@ -122,8 +122,9 @@ The first thing that we need to do is to declare the unique [resource](https://d
 Open the project in your IDE (like Visual Studio) to configure the code.
 >In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Open the `TodoListService\Web.config` file
-1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (appmodelv2-nativeclient-dotnet)` application copied from the Azure portal.
+1. Open the `TodoListService\appsettings.json` file
+1. Find the `ClientId` property and replace the existing value with the application ID (clientId) of the `TodoListService (appmodelv2-nativeclient-dotnet)` application copied from the Azure portal.
+1. Find the `Audience` property, and replace the ClientId as well.
 
 #### Register the client app (TodoListClient (appmodelv2-nativeclient-dotnet))
 
@@ -178,15 +179,5 @@ Clean the solution, rebuild the solution, and run it.  You might want to go into
 
 By default, when you download this code sample and configure the application to use the Microsoft identity platform endpoint following the preceding steps, both personal accounts - like outlook.com, live.com, and others - as well as Work or school accounts from any organizations that are integrated with Azure AD can request tokens and access your Web API. 
 
-To restrict who can sign in to your application, use one of the options:
-
-### Option 1: Restrict access to a single organization (single-tenant)
-
-You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*:
-
-1. Open the **App_Start\Startup.Auth** file, and change the value of the metadata endpoint that's passed into the `OpenIdConnectSecurityTokenProvider` to `"https://login.microsoftonline.com/{Tenant ID}/v2.0/.well-known/openid-configuration"` (you can also use the Tenant Name, such as `contoso.onmicrosoft.com`).
-2. In the same file, set the `ValidIssuer` property on the `TokenValidationParameters` to `"https://sts.windows.net/{Tenant Id}/"` and the `ValidateIssuer` argument to `true`.
-
-#### Option 2: Use a custom method to validate issuers
-
-You can implement a custom method to validate issuers by using the **IssuerValidator** parameter. For more information about how to use this parameter, read about the [TokenValidationParameters class](https://msdn.microsoft.com/library/system.identitymodel.tokens.tokenvalidationparameters.aspx) on MSDN.
+You can restrict sign-in access for your application to only user accounts that are in a single Azure AD tenant - including *guest accounts* of that tenant. This scenario is a common for *line-of-business applications*
+by changing the TenantId in the appsettings.json
